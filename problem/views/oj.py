@@ -46,8 +46,12 @@ class ProblemAPI(APIView):
         problem_id = request.GET.get("problem_id")
         if problem_id:
             try:
-                problem = Problem.objects.select_related("created_by") \
-                    .get(_id=problem_id, contest_id__isnull=True, visible=True)
+                if request.user.is_admin_role():
+                    problem = Problem.objects.select_related("created_by") \
+                        .get(id=problem_id, contest_id_isnull=True)
+                else:
+                    problem = Problem.objects.select_related("created_by") \
+                        .get(id=problem_id, contest_id__isnull=True, visible=True)
                 problem_data = ProblemSerializer(problem).data
                 self._add_problem_status(request, problem_data)
                 return self.success(problem_data)
@@ -99,11 +103,15 @@ class ContestProblemAPI(APIView):
         problem_id = request.GET.get("problem_id")
         if problem_id:
             try:
-                problem = Problem.objects.select_related("created_by").get(_id=problem_id,
-                                                                           contest=self.contest,
-                                                                           visible=True)
+                if request.user.is_admin_role():
+                    problem = Problem.objects.select_related("created_by").get(_id=problem_id,
+                                                                               contest=self.contest)
+                else:
+                    problem = Problem.objects.select_related("created_by").get(_id=problem_id,
+                                                                               contest=self.contest,
+                                                                               visible=True)
             except Problem.DoesNotExist:
-                return self.error("Problem does not exist.")
+                return self.error("Problem does not exist")
             if self.contest.problem_details_permission(request.user):
                 problem_data = ProblemSerializer(problem).data
                 self._add_problem_status(request, [problem_data, ])
