@@ -46,12 +46,12 @@ class ProblemAPI(APIView):
         problem_id = request.GET.get("problem_id")
         if problem_id:
             try:
-                if request.user.is_admin_role():
+                if request.user.is_authenticated and request.user.is_admin_role():
                     problem = Problem.objects.select_related("created_by") \
-                        .get(id=problem_id, contest_id__isnull=True)
+                        .get(_id=problem_id, contest_id__isnull=True)
                 else:
                     problem = Problem.objects.select_related("created_by") \
-                        .get(id=problem_id, contest_id__isnull=True, visible=True)
+                        .get(_id=problem_id, contest_id__isnull=True, visible=True)
                 problem_data = ProblemSerializer(problem).data
                 self._add_problem_status(request, problem_data)
                 return self.success(problem_data)
@@ -63,9 +63,11 @@ class ProblemAPI(APIView):
             return self.error("Limit is needed")
 
         # 隐藏题目对管理员可见
-        if request.user.is_admin_role():
+        if request.user.is_authenticated and request.user.is_admin_role():
+
             problems = Problem.objects.select_related("created_by").filter(contest_id__isnull=True)
         else:
+
             problems = Problem.objects.select_related("created_by").filter(contest_id__isnull=True, visible=True)
         # 按照标签筛选
         tag_text = request.GET.get("tag")
