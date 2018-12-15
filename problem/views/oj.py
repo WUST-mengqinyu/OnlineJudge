@@ -48,7 +48,7 @@ class ProblemAPI(APIView):
             try:
                 if request.user.is_admin_role():
                     problem = Problem.objects.select_related("created_by") \
-                        .get(id=problem_id, contest_id_isnull=True)
+                        .get(id=problem_id, contest_id__isnull=True)
                 else:
                     problem = Problem.objects.select_related("created_by") \
                         .get(id=problem_id, contest_id__isnull=True, visible=True)
