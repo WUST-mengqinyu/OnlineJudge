@@ -136,7 +136,11 @@ class FPSHelper(object):
         test_cases = {}
         for index, item in enumerate(problem["test_cases"]):
             input_content = item.get("input")
+            if input_content is None:
+                input_content = ""
             output_content = item.get("output")
+            if output_content is None:
+                output_content = ""
             if input_content:
                 with open(os.path.join(base_dir, str(index + 1) + ".in"), "w", encoding="utf-8") as f:
                     f.write(input_content)
@@ -174,7 +178,10 @@ if __name__ == "__main__":
     problems = parser.parse()
     for index, problem in enumerate(problems):
         path = os.path.join("/tmp/", str(index + 1))
-        os.mkdir(path)
+        try:
+            os.mkdir(path)
+        except:
+            pass
         helper.save_test_case(problem, path)
 
         pprint.pprint(helper.save_image(problem, "/tmp", "/static/img"))

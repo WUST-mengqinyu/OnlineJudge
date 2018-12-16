@@ -15,7 +15,7 @@ class TestCaseUploadForm(forms.Form):
 
 
 class CreateSampleSerializer(serializers.Serializer):
-    input = serializers.CharField(trim_whitespace=False)
+    input = serializers.CharField(trim_whitespace=False, allow_blank=True, allow_null=True)
     output = serializers.CharField(trim_whitespace=False)
 
 
@@ -245,7 +245,7 @@ class FPSProblemSerializer(serializers.Serializer):
 
     title = serializers.CharField(max_length=128)
     description = serializers.CharField()
-    input = serializers.CharField()
+    input = serializers.CharField(allow_blank=True, allow_null=True)
     output = serializers.CharField()
     hint = serializers.CharField(allow_blank=True, allow_null=True)
     time_limit = UnitSerializer()
