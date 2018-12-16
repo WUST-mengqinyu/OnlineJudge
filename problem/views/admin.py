@@ -521,13 +521,19 @@ class ExportProblemAPI(APIView):
         with open(os.path.join(problem_test_case_dir, "info")) as f:
             info = json.load(f)
         for k, v in info["test_cases"].items():
-            zip_file.write(filename=os.path.join(problem_test_case_dir, v["input_name"]),
-                           arcname=f"{index}/testcase/{v['input_name']}",
-                           compress_type=compression)
-            if not info["spj"]:
-                zip_file.write(filename=os.path.join(problem_test_case_dir, v["output_name"]),
-                               arcname=f"{index}/testcase/{v['output_name']}",
+            try:
+                zip_file.write(filename=os.path.join(problem_test_case_dir, v["input_name"]),
+                               arcname=f"{index}/testcase/{v['input_name']}",
                                compress_type=compression)
+            except:
+                pass
+            if not info["spj"]:
+                try:
+                    zip_file.write(filename=os.path.join(problem_test_case_dir, v["output_name"]),
+                                   arcname=f"{index}/testcase/{v['output_name']}",
+                                   compress_type=compression)
+                except:
+                    pass
 
     @validate_serializer(ExportProblemRequestSerialzier)
     def get(self, request):
@@ -675,10 +681,19 @@ class FPSProblemImport(CSRFExemptAPIView):
         form = UploadProblemForm(request.POST, request.FILES)
         if form.is_valid():
             file = form.cleaned_data["file"]
-            with tempfile.NamedTemporaryFile("wb") as tf:
+            # with tempfile.NamedTemporaryFile('wb') as tf:
+            #     for chunk in file.chunks(4096):
+            #         tf.write(chunk)
+
+            from uuid import uuid1
+            uuid1()
+            with open('/tmp/' + ''.join(str(uuid1()).split('-')) + '.xml', "wb") as tf:
+                print(tf.name)
                 for chunk in file.chunks(4096):
-                    tf.file.write(chunk)
-                problems = FPSParser(tf.name).parse()
+                    tf.write(chunk)
+            problems = FPSParser(tf.name).parse()
+
+
         else:
             return self.error("Parse upload file error")
 
