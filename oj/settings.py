@@ -208,7 +208,7 @@ CELERY_TASK_SOFT_TIME_LIMIT = CELERY_TASK_TIME_LIMIT = 180
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
 RAVEN_CONFIG = {
-    'dsn': 'https://b200023b8aed4d708fb593c5e0a6ad3d:1fddaba168f84fcf97e0d549faaeaff0@sentry.io/263057'
+    'dsn': 'https://7bbbff4276cc4728b65404f8e9482750@sentry.io/1360427'
 }
 
 IP_HEADER = "HTTP_X_REAL_IP"
