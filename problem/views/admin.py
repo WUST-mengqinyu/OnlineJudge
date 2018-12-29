@@ -2,7 +2,6 @@ import hashlib
 import json
 import os
 import shutil
-import tempfile
 import zipfile
 from wsgiref.util import FileWrapper
 
@@ -521,19 +520,14 @@ class ExportProblemAPI(APIView):
         with open(os.path.join(problem_test_case_dir, "info")) as f:
             info = json.load(f)
         for k, v in info["test_cases"].items():
-            try:
-                zip_file.write(filename=os.path.join(problem_test_case_dir, v["input_name"]),
-                               arcname=f"{index}/testcase/{v['input_name']}",
-                               compress_type=compression)
-            except:
-                pass
+            zip_file.write(filename=os.path.join(problem_test_case_dir, v["input_name"]),
+                           arcname=f"{index}/testcase/{v['input_name']}",
+                           compress_type=compression)
             if not info["spj"]:
-                try:
-                    zip_file.write(filename=os.path.join(problem_test_case_dir, v["output_name"]),
-                                   arcname=f"{index}/testcase/{v['output_name']}",
-                                   compress_type=compression)
-                except:
-                    pass
+
+                zip_file.write(filename=os.path.join(problem_test_case_dir, v["output_name"]),
+                               arcname=f"{index}/testcase/{v['output_name']}",
+                               compress_type=compression)
 
     @validate_serializer(ExportProblemRequestSerialzier)
     def get(self, request):
@@ -692,8 +686,6 @@ class FPSProblemImport(CSRFExemptAPIView):
                 for chunk in file.chunks(4096):
                     tf.write(chunk)
             problems = FPSParser(tf.name).parse()
-
-
         else:
             return self.error("Parse upload file error")
 

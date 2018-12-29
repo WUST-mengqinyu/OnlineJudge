@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import os
 import base64
 import copy
 import random
@@ -178,10 +177,7 @@ if __name__ == "__main__":
     problems = parser.parse()
     for index, problem in enumerate(problems):
         path = os.path.join("/tmp/", str(index + 1))
-        try:
-            os.mkdir(path)
-        except:
-            pass
+        os.mkdir(path)
         helper.save_test_case(problem, path)
 
         pprint.pprint(helper.save_image(problem, "/tmp", "/static/img"))
