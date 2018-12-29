@@ -4,6 +4,7 @@
 [![Django](https://img.shields.io/badge/django-1.11.4-blue.svg?style=flat-square)](https://www.djangoproject.com/)
 [![Django Rest Framework](https://img.shields.io/badge/django_rest_framework-3.4.0-blue.svg?style=flat-square)](http://www.django-rest-framework.org/)
 [![Build Status](https://travis-ci.org/badcw-OnlineJudge/OnlineJudge.svg?branch=master)](https://travis-ci.org/badcw-OnlineJudge/OnlineJudge)
+[![Coverage Status](https://coveralls.io/repos/github/badcw-OnlineJudge/OnlineJudge/badge.svg?branch=master)](https://coveralls.io/github/badcw-OnlineJudge/OnlineJudge?branch=master)
 
 > #### An onlinejudge system based on Python and Vue. [Demo](http://verly-badcw.top:8020/)
 
