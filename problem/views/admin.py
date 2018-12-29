@@ -524,7 +524,6 @@ class ExportProblemAPI(APIView):
                            arcname=f"{index}/testcase/{v['input_name']}",
                            compress_type=compression)
             if not info["spj"]:
-
                 zip_file.write(filename=os.path.join(problem_test_case_dir, v["output_name"]),
                                arcname=f"{index}/testcase/{v['output_name']}",
                                compress_type=compression)
@@ -681,7 +680,7 @@ class FPSProblemImport(CSRFExemptAPIView):
 
             from uuid import uuid1
             uuid1()
-            with open('/tmp/' + ''.join(str(uuid1()).split('-')) + '.xml', "wb") as tf:
+            with open("/tmp/" + "".join(str(uuid1()).split("-")) + ".xml", "wb") as tf:
                 print(tf.name)
                 for chunk in file.chunks(4096):
                     tf.write(chunk)
