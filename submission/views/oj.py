@@ -81,7 +81,7 @@ class SubmissionAPI(APIView):
         else:
             return self.success({"submission_id": submission.id})
 
-    @login_required
+    # @login_required
     def get(self, request):
         if any(request.user):
             submission_id = request.GET.get("id")
