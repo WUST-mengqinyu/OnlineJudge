@@ -83,23 +83,36 @@ class SubmissionAPI(APIView):
 
     @login_required
     def get(self, request):
-        submission_id = request.GET.get("id")
-        if not submission_id:
-            return self.error("Parameter id doesn't exist")
-        try:
-            submission = Submission.objects.select_related("problem").get(id=submission_id)
-        except Submission.DoesNotExist:
-            return self.error("Submission doesn't exist")
-        if not submission.check_user_permission(request.user):
-            return self.error("No permission for this submission")
+        if any(request.user):
+            submission_id = request.GET.get("id")
+            if not submission_id:
+                return self.error("Parameter id doesn't exist")
+            try:
+                submission = Submission.objects.select_related("problem").get(id=submission_id)
+            except Submission.DoesNotExist:
+                return self.error("Submission doesn't exist")
+            if not submission.check_user_permission(request.user):
+                return self.error("No permission for this submission")
 
-        if submission.problem.rule_type == ProblemRuleType.OI or request.user.is_admin_role():
-            submission_data = SubmissionModelSerializer(submission).data
+            if submission.problem.rule_type == ProblemRuleType.OI or request.user.is_admin_role():
+                submission_data = SubmissionModelSerializer(submission).data
+            else:
+                submission_data = SubmissionSafeModelSerializer(submission).data
+            # 是否有权限取消共享
+            submission_data["can_unshare"] = submission.check_user_permission(request.user, check_share=False)
+            return self.success(submission_data)
         else:
+            submission_id = request.GET.get("id")
+            if not submission_id:
+                return self.error("Parameter id doesn't exist")
+            try:
+                submission = Submission.objects.select_related("problem").get(id=submission_id)
+            except Submission.DoesNotExist:
+                return self.error("Submission doesn't exist")
             submission_data = SubmissionSafeModelSerializer(submission).data
-        # 是否有权限取消共享
-        submission_data["can_unshare"] = submission.check_user_permission(request.user, check_share=False)
-        return self.success(submission_data)
+            return self.success(submission_data)
+
+
 
     @validate_serializer(ShareSubmissionSerializer)
     @login_required
