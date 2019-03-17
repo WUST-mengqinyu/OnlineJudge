@@ -664,7 +664,7 @@ class FPSProblemImport(CSRFExemptAPIView):
                                spj_code=problem_data["spj"]["code"] if spj else None,
                                spj_language=problem_data["spj"]["language"] if spj else None,
                                spj_version=rand_str(8) if spj else "",
-                               visible=False,
+                               visible=True,
                                languages=language_names,
                                created_by=creator,
                                difficulty=Difficulty.MID,
