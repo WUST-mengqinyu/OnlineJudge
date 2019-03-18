@@ -562,13 +562,15 @@ class ImportProblemAPI(CSRFExemptAPIView, TestCaseZipProcessor):
             return self.error("Upload failed")
 
         count = 0
+        total_name = []
         with zipfile.ZipFile(tmp_file, "r") as zip_file:
             name_list = zip_file.namelist()
             for item in name_list:
                 if "/problem.json" in item:
+                    total_name.append(item[:-13])
                     count += 1
             with transaction.atomic():
-                for i in range(1, count + 1):
+                for i in total_name:
                     with zip_file.open(f"{i}/problem.json") as f:
                         problem_info = json.load(f)
                         serializer = ImportProblemSerializer(data=problem_info)
