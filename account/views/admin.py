@@ -27,16 +27,18 @@ class UserAdminAPI(APIView):
         data = request.data["users"]
 
         user_list = []
+        real_name_list = []
         for user_data in data:
             if len(user_data) < 3 or len(user_data[0]) > 32:
                 return self.error(f"Error occurred while processing data '{user_data}'")
-            user_list.append(User(username=user_data[0], password=make_password(user_data[1]), email=user_data[2],
-                                  real_name=user_data[3]))
+            user_list.append(User(username=user_data[0], password=make_password(user_data[1]), email=user_data[2]))
+            real_name_list.append(user_data[3])
 
         try:
             with transaction.atomic():
                 ret = User.objects.bulk_create(user_list)
-                UserProfile.objects.bulk_create([UserProfile(user=user) for user in ret])
+                UserProfile.objects.bulk_create([UserProfile(user=user, real_name=real_name) for (user, real_name)
+                                                 in zip(ret, real_name_list)])
             return self.success()
         except IntegrityError as e:
             # Extract detail from exception message
@@ -65,7 +67,6 @@ class UserAdminAPI(APIView):
         user.email = data["email"].lower()
         user.admin_type = data["admin_type"]
         user.is_disabled = data["is_disabled"]
-        user.userprofile.real_name = data["real_name"]
 
         if data["admin_type"] == AdminType.ADMIN:
             user.problem_permission = data["problem_permission"]
