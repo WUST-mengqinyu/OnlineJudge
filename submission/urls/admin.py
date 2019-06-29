@@ -4,6 +4,6 @@ from ..views.admin import SubmissionRejudgeAPI, ProblemRejudgeAPI, ContestProble
 
 urlpatterns = [
     url(r"^submission/rejudge?$", SubmissionRejudgeAPI.as_view(), name="submission_rejudge_api"),
-    url(r"^submission/problem_rejudge?$", ProblemRejudgeAPI.as_view(), name="submission_rejudge_api"),
-    url(r"^submission/contest_problem_rejudge?$", ContestProblemRejudgeAPI.as_view(), name="submission_rejudge_api"),
+    url(r"^submission/problem_rejudge?$", ProblemRejudgeAPI.as_view(), name="problem_rejudge_api"),
+    url(r"^submission/contest_problem_rejudge?$", ContestProblemRejudgeAPI.as_view(), name="contest_problem_rejudge_api"),
 ]
