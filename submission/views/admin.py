@@ -31,13 +31,13 @@ class ProblemRejudgeAPI(APIView):
         if not problem_id:
             return self.error("Parameter error, id is required")
         try:
-            submission = Submission.objects.select_related("problem").get(problem=problem_id, contest_id__isnull=True)
+            submissions = Submission.objects.select_related("problem").get(problem=problem_id, contest_id__isnull=True)
         except Submission.DoesNotExist:
-            return self.error("Submission does not exists")
-        submission.statistic_info = {}
-        submission.save()
-
-        judge_task.delay(submission.id, submission.problem.id)
+            return self.error("Problem does not exists")
+        for submission in submissions:
+            submission.statistic_info = {}
+            submission.save()
+            judge_task.delay(submission.id, submission.problem.id)
         return self.success()
 
 
@@ -49,11 +49,11 @@ class ContestProblemRejudgeAPI(APIView):
         if (not problem_id) or (not contest_id):
             return self.error("Parameter error, id is required")
         try:
-            submission = Submission.objects.select_related("problem").get(problem=problem_id, contest=contest_id)
+            submissions = Submission.objects.select_related("problem").get(problem=problem_id, contest=contest_id)
         except Submission.DoesNotExist:
-            return self.error("Submission does not exists")
-        submission.statistic_info = {}
-        submission.save()
-
-        judge_task.delay(submission.id, submission.problem.id)
+            return self.error("Problem does not exists")
+        for submission in submissions:
+            submission.statistic_info = {}
+            submission.save()
+            judge_task.delay(submission.id, submission.problem.id)
         return self.success()
