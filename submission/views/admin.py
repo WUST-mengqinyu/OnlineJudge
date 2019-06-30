@@ -4,7 +4,6 @@ from problem.models import Problem
 # from judge.dispatcher import JudgeDispatcher
 from utils.api import APIView
 from ..models import Submission
-import time
 
 
 class SubmissionRejudgeAPI(APIView):
@@ -29,7 +28,7 @@ class SubmissionRejudgeAPI(APIView):
 class ProblemRejudgeAPI(APIView):
     @super_admin_required
     def get(self, request):
-        problem_id = str(request.GET.get("problem_id"))
+        problem_id = request.GET.get("problem_id")
         if not problem_id:
             return self.error("Parameter error, id is required")
         try:
@@ -41,19 +40,17 @@ class ProblemRejudgeAPI(APIView):
         except Submission.DoesNotExist:
             return self.error("Submission does not exists")
         for submission in submissions.objects.all():
-            f.write(f"{submission.id} {submission.problem.id}\n")
             submission.statistic_info = {}
             submission.save()
             judge_task.delay(submission.id, submission.problem.id)
-            time.sleep(1)
         return self.success()
 
 
 class ContestProblemRejudgeAPI(APIView):
     @super_admin_required
     def get(self, request):
-        problem_id = str(request.GET.get("problem_id"))
-        contest_id = str(request.GET.get("contest_id"))
+        problem_id = request.GET.get("problem_id")
+        contest_id = request.GET.get("contest_id")
         if (not problem_id) or (not contest_id):
             return self.error("Parameter error, id is required")
         try:
@@ -68,5 +65,4 @@ class ContestProblemRejudgeAPI(APIView):
             submission.statistic_info = {}
             submission.save()
             judge_task.delay(submission.id, submission.problem.id)
-            time.sleep(1)
         return self.success()
