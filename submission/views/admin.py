@@ -4,6 +4,7 @@ from problem.models import Problem
 # from judge.dispatcher import JudgeDispatcher
 from utils.api import APIView
 from ..models import Submission
+import time
 
 
 class SubmissionRejudgeAPI(APIView):
@@ -32,11 +33,11 @@ class ProblemRejudgeAPI(APIView):
         if not problem_id:
             return self.error("Parameter error, id is required")
         try:
-            problem = Problem.objects.get(_id=problem_id, contest_id__isnull=True)
+            problem = Problem.objects.get(id=problem_id, contest_id__isnull=True)
         except Problem.DoesNotExist:
             return self.error("Problem does not exists")
         try:
-            submissions = Submission.objects.filter(problem=problem)
+            submissions = Submission.objects.select_related("problem").filter(problem=problem)
         except Submission.DoesNotExist:
             return self.error("Submission does not exists")
         for submission in submissions.objects.all():
@@ -44,6 +45,7 @@ class ProblemRejudgeAPI(APIView):
             submission.statistic_info = {}
             submission.save()
             judge_task.delay(submission.id, submission.problem.id)
+            time.sleep(1)
         return self.success()
 
 
@@ -55,15 +57,16 @@ class ContestProblemRejudgeAPI(APIView):
         if (not problem_id) or (not contest_id):
             return self.error("Parameter error, id is required")
         try:
-            problem = Problem.objects.get(_id=problem_id, contest_id=contest_id)
+            problem = Problem.objects.get(id=problem_id, contest_id=contest_id)
         except Problem.DoesNotExist:
             return self.error("Problem does not exists")
         try:
-            submissions = Submission.objects.filter(problem=problem)
+            submissions = Submission.objects.select_related("problem").filter(problem=problem)
         except Submission.DoesNotExist:
             return self.error("Submission does not exists")
         for submission in submissions.objects.all():
             submission.statistic_info = {}
             submission.save()
             judge_task.delay(submission.id, submission.problem.id)
+            time.sleep(1)
         return self.success()
