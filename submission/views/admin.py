@@ -1,5 +1,6 @@
 from account.decorators import super_admin_required
 from judge.tasks import judge_task
+from problem.models import Problem
 # from judge.dispatcher import JudgeDispatcher
 from utils.api import APIView
 from ..models import Submission
