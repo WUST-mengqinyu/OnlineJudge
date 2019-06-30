@@ -27,11 +27,11 @@ class SubmissionRejudgeAPI(APIView):
 class ProblemRejudgeAPI(APIView):
     @super_admin_required
     def get(self, request):
-        problem_id = request.GET.get("problem_id")
+        problem_id = str(request.GET.get("problem_id"))
         if not problem_id:
             return self.error("Parameter error, id is required")
         try:
-            submissions = Submission.objects.filter(problem_id=problem_id, contest_id__isnull=True)
+            submissions = Submission.objects.select_related("problem").filter(problem_id=problem_id, contest_id__isnull=True)
         except Submission.DoesNotExist:
             return self.error("Problem does not exists")
         for submission in submissions.objects.all():
@@ -44,12 +44,12 @@ class ProblemRejudgeAPI(APIView):
 class ContestProblemRejudgeAPI(APIView):
     @super_admin_required
     def get(self, request):
-        problem_id = request.GET.get("problem_id")
-        contest_id = request.GET.get("contest_id")
+        problem_id = str(request.GET.get("problem_id"))
+        contest_id = str(request.GET.get("contest_id"))
         if (not problem_id) or (not contest_id):
             return self.error("Parameter error, id is required")
         try:
-            submissions = Submission.objects.filter(problem_id=problem_id, contest_id=contest_id)
+            submissions = Submission.objects.select_related("problem").filter(problem_id=problem_id, contest_id=contest_id)
         except Submission.DoesNotExist:
             return self.error("Problem does not exists")
         for submission in submissions.objects.all():
