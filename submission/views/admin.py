@@ -34,10 +34,14 @@ class ProblemRejudgeAPI(APIView):
             submissions = Submission.objects.select_related("problem").filter(problem_id=problem_id, contest_id__isnull=True)
         except Submission.DoesNotExist:
             return self.error("Problem does not exists")
+        f = open("log.txt", "w+")
+        f.write("search for problem\n")
         for submission in submissions.objects.all():
+            f.write(f"{submission.id} {submission.problem.id}\n")
             submission.statistic_info = {}
             submission.save()
             judge_task.delay(submission.id, submission.problem.id)
+        f.close()
         return self.success()
 
 
@@ -52,8 +56,12 @@ class ContestProblemRejudgeAPI(APIView):
             submissions = Submission.objects.select_related("problem").filter(problem_id=problem_id, contest_id=contest_id)
         except Submission.DoesNotExist:
             return self.error("Problem does not exists")
+        f = open("log.txt", "w+")
+        f.write("search for contest problem\n")
         for submission in submissions.objects.all():
+            f.write(f"{submission.id} {submission.problem.id}\n")
             submission.statistic_info = {}
             submission.save()
             judge_task.delay(submission.id, submission.problem.id)
+        f.close()
         return self.success()
