@@ -31,17 +31,18 @@ class ProblemRejudgeAPI(APIView):
         if not problem_id:
             return self.error("Parameter error, id is required")
         try:
-            submissions = Submission.objects.select_related("problem").filter(problem_id=problem_id, contest_id__isnull=True)
-        except Submission.DoesNotExist:
+            problem = Problem.objects.get(_id=problem_id, contest_id__isnull=True)
+        except Problem.DoesNotExist:
             return self.error("Problem does not exists")
-        f = open("log.txt", "w+")
-        f.write("search for problem\n")
+        try:
+            submissions = Submission.objects.filter(problem=problem)
+        except Submission.DoesNotExist:
+            return self.error("Submission does not exists")
         for submission in submissions.objects.all():
             f.write(f"{submission.id} {submission.problem.id}\n")
             submission.statistic_info = {}
             submission.save()
             judge_task.delay(submission.id, submission.problem.id)
-        f.close()
         return self.success()
 
 
@@ -53,15 +54,15 @@ class ContestProblemRejudgeAPI(APIView):
         if (not problem_id) or (not contest_id):
             return self.error("Parameter error, id is required")
         try:
-            submissions = Submission.objects.select_related("problem").filter(problem_id=problem_id, contest_id=contest_id)
-        except Submission.DoesNotExist:
+            problem = Problem.objects.get(_id=problem_id, contest_id=contest_id)
+        except Problem.DoesNotExist:
             return self.error("Problem does not exists")
-        f = open("log.txt", "w+")
-        f.write("search for contest problem\n")
+        try:
+            submissions = Submission.objects.filter(problem=problem)
+        except Submission.DoesNotExist:
+            return self.error("Submission does not exists")
         for submission in submissions.objects.all():
-            f.write(f"{submission.id} {submission.problem.id}\n")
             submission.statistic_info = {}
             submission.save()
             judge_task.delay(submission.id, submission.problem.id)
-        f.close()
         return self.success()
