@@ -53,7 +53,7 @@ class ContestProblemRejudgeAPI(APIView):
         if (not problem_id) or (not contest_id):
             return self.error("Parameter error, id is required")
         try:
-            problem = Problem.objects.get(_id=problem_id, contest=contest_id)
+            problem = Problem.objects.select_related("contest").get(_id=problem_id, contest_id=contest_id)
         except Problem.DoesNotExist:
             return self.error("Problem does not exists Contest: %s, Problem: %s" % (contest_id, problem_id))
         try:
