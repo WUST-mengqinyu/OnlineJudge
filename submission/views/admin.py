@@ -13,9 +13,7 @@ class SubmissionRejudgeAPI(APIView):
         if not id:
             return self.error("Parameter error, id is required")
         try:
-            # 增加contest内rejudge
-            submission = Submission.objects.select_related("problem").get(id=id)
-            # submission = Submission.objects.select_related("problem").get(id=id, contest_id__isnull=True)
+            submission = Submission.objects.select_related("problem").get(id=id, contest_id__isnull=True)
         except Submission.DoesNotExist:
             return self.error("Submission does not exists")
         submission.statistic_info = {}
@@ -30,13 +28,13 @@ class ProblemRejudgeAPI(APIView):
     def get(self, request):
         problem_id = request.GET.get("problem_id")
         if not problem_id:
-            return self.error("Parameter error, id is required")
+            return self.error("Parameter error, problem id is required")
         try:
             problem = Problem.objects.get(id=problem_id, contest_id__isnull=True)
         except Problem.DoesNotExist:
             return self.error("Problem does not exists")
         try:
-            submissions = Submission.objects.select_related("problem").filter(problem=problem)
+            submissions = Submission.objects.filter(id=problem_id, contest_id__isnull=True)
         except Submission.DoesNotExist:
             return self.error("Submission does not exists")
         for submission in submissions.objects.all():
@@ -54,11 +52,11 @@ class ContestProblemRejudgeAPI(APIView):
         if (not problem_id) or (not contest_id):
             return self.error("Parameter error, id is required")
         try:
-            problem = Problem.objects.get(id=problem_id, contest_id=contest_id)
+            problem = Problem.objects.get(_id=problem_id, contest_id=contest_id)
         except Problem.DoesNotExist:
-            return self.error("Problem does not exists")
+            return self.error("Problem does not exists Contest: %d, Problem: %d" % contest_id, problem_id)
         try:
-            submissions = Submission.objects.select_related("problem").filter(problem=problem)
+            submissions = Submission.objects.filter(problem_id=problem.id, contest_id=problem.contest_id)
         except Submission.DoesNotExist:
             return self.error("Submission does not exists")
         for submission in submissions.objects.all():
