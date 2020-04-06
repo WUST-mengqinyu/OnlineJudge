@@ -34,10 +34,10 @@ class ProblemRejudgeAPI(APIView):
         except Problem.DoesNotExist:
             return self.error("Problem does not exists")
         try:
-            submissions = Submission.objects.filter(id=problem_id, contest_id__isnull=True)
+            submissions = Submission.objects.filter(problem_id=problem_id, contest_id__isnull=True)
         except Submission.DoesNotExist:
             return self.error("Submission does not exists")
-        for submission in submissions.objects.all():
+        for submission in submissions:
             submission.statistic_info = {}
             submission.save()
             judge_task.delay(submission.id, submission.problem.id)
@@ -47,19 +47,20 @@ class ProblemRejudgeAPI(APIView):
 class ContestProblemRejudgeAPI(APIView):
     @super_admin_required
     def get(self, request):
-        problem_id = request.GET.get("problem_id")
-        contest_id = request.GET.get("contest_id")
+        # -- todo -- ?????? I don't know why two field is swapped?
+        problem_id = request.GET.get("contest_id")
+        contest_id = request.GET.get("problem_id")
         if (not problem_id) or (not contest_id):
             return self.error("Parameter error, id is required")
         try:
-            problem = Problem.objects.get(_id=problem_id, contest_id=contest_id)
+            problem = Problem.objects.get(_id=problem_id, contest=contest_id)
         except Problem.DoesNotExist:
-            return self.error("Problem does not exists Contest: %d, Problem: %d" % contest_id, problem_id)
+            return self.error("Problem does not exists Contest: %s, Problem: %s" % (contest_id, problem_id))
         try:
             submissions = Submission.objects.filter(problem_id=problem.id, contest_id=problem.contest_id)
         except Submission.DoesNotExist:
             return self.error("Submission does not exists")
-        for submission in submissions.objects.all():
+        for submission in submissions:
             submission.statistic_info = {}
             submission.save()
             judge_task.delay(submission.id, submission.problem.id)
